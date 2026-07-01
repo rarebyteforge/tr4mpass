@@ -140,7 +140,11 @@ send_staged_image(irecv_client_t client, const char *path,
     }
 
     log_info("path_a_ramdisk: sending %s (%s)", label, path);
+#ifdef IRECV_SEND_OPT_DFU_NOTIFY_FINISH
     err = irecv_send_file(client, path, IRECV_SEND_OPT_DFU_NOTIFY_FINISH);
+#else
+    err = irecv_send_file(client, path, 0);
+#endif
     if (err != IRECV_E_SUCCESS) {
         log_error("path_a_ramdisk: failed to send %s: %s",
                   label, irecv_strerror(err));

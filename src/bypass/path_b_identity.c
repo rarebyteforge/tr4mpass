@@ -209,12 +209,21 @@ int path_b_write_serial_irecovery(device_info_t *dev, const char *new_serial)
 
     /* Verify the device is actually in recovery (not DFU or normal) */
     info = irecv_get_device_info(client);
+#ifdef HAVE_PID_FIELD
     if (!info || info->pid != APPLE_RECOVERY_PID) {
         log_error("[path_b_id] Device is not in recovery mode (pid=0x%04X)",
                   info ? (unsigned)info->pid : 0);
         irecv_close(client);
         return -1;
     }
+#else
+    if (!info || info->cpid != APPLE_RECOVERY_PID) {
+        log_error("[path_b_id] Device is not in recovery mode (cpid=0x%04X)",
+                  info ? (unsigned)info->cpid : 0);
+        irecv_close(client);
+        return -1;
+    }
+#endif
 
     /* Set the serial-number environment variable */
     err = irecv_setenv(client, "serial-number", new_serial);
